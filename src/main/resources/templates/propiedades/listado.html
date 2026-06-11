@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Propiedades</title>
+</head>
+<body>
+
+<h1>Listado de Propiedades</h1>
+
+<p>
+    <a th:href="@{/propiedades/nueva}">Nueva propiedad</a>
+</p>
+
+<div th:if="${mensaje}">
+    <p style="color: green;" th:text="${mensaje}"></p>
+</div>
+
+<div th:if="${error}">
+    <p style="color: red;" th:text="${error}"></p>
+</div>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Dirección</th>
+            <th>Ciudad</th>
+            <th>Tipo</th>
+            <th>Ambientes</th>
+            <th>Metros cuadrados</th>
+            <th>Estado</th>
+            <th>Propietario</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr th:each="propiedad : ${propiedades}">
+            <td th:text="${propiedad.id}"></td>
+            <td th:text="${propiedad.direccion}"></td>
+            <td th:text="${propiedad.ciudad}"></td>
+            <td th:text="${propiedad.tipoPropiedad}"></td>
+            <td th:text="${propiedad.cantidadAmbientes}"></td>
+            <td th:text="${propiedad.metrosCuadrados}"></td>
+            <td th:text="${propiedad.estadoDisponibilidad}"></td>
+            <td th:text="${propiedad.propietario != null ? propiedad.propietario.nombreCompleto : 'Sin propietario'}"></td>
+            <td>
+                <a th:href="@{/propiedades/editar/{id}(id=${propiedad.id})}">Editar</a>
+                |
+                <a th:href="@{/propiedades/eliminar/{id}(id=${propiedad.id})}"
+                   onclick="return confirm('¿Seguro que desea eliminar esta propiedad?');">
+                    Eliminar
+                </a>
+            </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(propiedades)}">
+            <td colspan="9">No hay propiedades registradas.</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+    <a th:href="@{/}">Volver al inicio</a>
+</p>
+
+</body>
+</html>
