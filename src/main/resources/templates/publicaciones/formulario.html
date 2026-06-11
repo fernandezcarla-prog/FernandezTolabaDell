@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Publicación</title>
+</head>
+<body>
+
+<h1>Formulario de Publicación</h1>
+
+<p>
+    <a th:href="@{/publicaciones}">Volver al listado</a>
+</p>
+
+<div th:if="${error}">
+    <p th:text="${error}" style="color: red;"></p>
+</div>
+
+<form th:object="${publicacion}"
+      th:action="${publicacion.id == null} ? @{/publicaciones/guardar} : @{/publicaciones/actualizar/{id}(id=${publicacion.id})}"
+      method="post">
+
+    <div>
+        <label>Propiedad:</label>
+        <select th:field="*{propiedad}">
+            <option value="">Seleccione una propiedad</option>
+            <option th:each="propiedad : ${propiedades}"
+                    th:value="${propiedad.id}"
+                    th:text="${propiedad.direccion + ' - ' + propiedad.ciudad + ' - ' + propiedad.estadoDisponibilidad}">
+            </option>
+        </select>
+        <span th:if="${#fields.hasErrors('propiedad')}"
+              th:errors="*{propiedad}"
+              style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Precio mensual:</label>
+        <input type="number" step="0.01" th:field="*{precioMensual}">
+        <span th:if="${#fields.hasErrors('precioMensual')}"
+              th:errors="*{precioMensual}"
+              style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Condiciones de alquiler:</label>
+        <textarea th:field="*{condicionesAlquiler}"></textarea>
+        <span th:if="${#fields.hasErrors('condicionesAlquiler')}"
+              th:errors="*{condicionesAlquiler}"
+              style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Descripción:</label>
+        <textarea th:field="*{descripcion}"></textarea>
+        <span th:if="${#fields.hasErrors('descripcion')}"
+              th:errors="*{descripcion}"
+              style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Fecha de publicación:</label>
+        <input type="date" th:field="*{fechaPublicacion}">
+        <span th:if="${#fields.hasErrors('fechaPublicacion')}"
+              th:errors="*{fechaPublicacion}"
+              style="color: red;"></span>
+    </div>
+
+    <div>
+        <label>Estado:</label>
+        <select th:field="*{estadoPublicacion}">
+            <option value="">Seleccione un estado</option>
+            <option th:each="estado : ${estadosPublicacion}"
+                    th:value="${estado}"
+                    th:text="${estado}">
+            </option>
+        </select>
+        <span th:if="${#fields.hasErrors('estadoPublicacion')}"
+              th:errors="*{estadoPublicacion}"
+              style="color: red;"></span>
+    </div>
+
+    <button type="submit">Guardar</button>
+
+</form>
+
+</body>
+</html>

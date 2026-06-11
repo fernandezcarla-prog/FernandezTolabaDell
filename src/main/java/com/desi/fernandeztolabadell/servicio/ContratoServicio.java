@@ -1,39 +1,33 @@
 package com.desi.fernandeztolabadell.servicio;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.desi.fernandeztolabadell.enums.EstadoContrato;
 import com.desi.fernandeztolabadell.enums.EstadoDisponibilidad;
 import com.desi.fernandeztolabadell.modelo.Contrato;
 import com.desi.fernandeztolabadell.modelo.HistorialEstadoContrato;
-import com.desi.fernandeztolabadell.modelo.HistorialEstadoPropiedad;
 import com.desi.fernandeztolabadell.modelo.Propiedad;
 import com.desi.fernandeztolabadell.repositorio.ContratoRepositorio;
 import com.desi.fernandeztolabadell.repositorio.HistorialEstadoContratoRepositorio;
-import com.desi.fernandeztolabadell.repositorio.HistorialEstadoPropiedadRepositorio;
 import com.desi.fernandeztolabadell.repositorio.PropiedadRepositorio;
 
 @Service
 public class ContratoServicio {
 
     private final ContratoRepositorio contratoRepositorio;
-    private final PropiedadRepositorio propiedadRepositorio;
     private final HistorialEstadoContratoRepositorio historialEstadoContratoRepositorio;
-    private final HistorialEstadoPropiedadRepositorio historialEstadoPropiedadRepositorio;
+    private final PropiedadRepositorio propiedadRepositorio;
 
     public ContratoServicio(
             ContratoRepositorio contratoRepositorio,
-            PropiedadRepositorio propiedadRepositorio,
             HistorialEstadoContratoRepositorio historialEstadoContratoRepositorio,
-            HistorialEstadoPropiedadRepositorio historialEstadoPropiedadRepositorio) {
+            PropiedadRepositorio propiedadRepositorio) {
         this.contratoRepositorio = contratoRepositorio;
-        this.propiedadRepositorio = propiedadRepositorio;
         this.historialEstadoContratoRepositorio = historialEstadoContratoRepositorio;
-        this.historialEstadoPropiedadRepositorio = historialEstadoPropiedadRepositorio;
+        this.propiedadRepositorio = propiedadRepositorio;
     }
 
     public List<Contrato> listarNoEliminados() {
@@ -41,137 +35,132 @@ public class ContratoServicio {
     }
 
     public Contrato buscarPorId(Long id) {
-        return contratoRepositorio.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No existe el contrato indicado"));
+        return contratoRepositorio.findByIdAndEliminadoFalse(id)
+                .orElseThrow(() -> new IllegalArgumentException("Contrato no encontrado"));
     }
 
-    @Transactional
-    public Contrato crear(Contrato contrato) {
-        Propiedad propiedad = propiedadRepositorio.findById(contrato.getPropiedad().getId())
-                .orElseThrow(() -> new IllegalArgumentException("No existe la propiedad indicada"));
-
+    public Contrato guardar(Contrato contrato) {
         if (contrato.getEstadoContrato() == null) {
             contrato.setEstadoContrato(EstadoContrato.BORRADOR);
         }
 
-        if (contrato.getEstadoContrato() == EstadoContrato.ACTIVO) {
-            validarActivacionContrato(propiedad, null);
-            cambiarEstadoPropiedad(propiedad, EstadoDisponibilidad.ALQUILADA);
+        if (contrato.getEliminado() == null) {
+            contrato.setEliminado(false);
         }
 
-        contrato.setPropiedad(propiedad);
-        contrato.setEliminado(false);
+        validarContrato(contrato, null);
 
-        Contrato contratoGuardado = contratoRepositorio.save(contrato);
+        Contrato guardado = contratoRepositorio.save(contrato);
+        registrarCambioEstado(guardado, null, guardado.getEstadoContrato());
 
-        historialEstadoContratoRepositorio.save(
-                new HistorialEstadoContrato(
-                        contratoGuardado,
-                        null,
-                        contratoGuardado.getEstadoContrato()
-                )
-        );
+        actualizarEstadoPropiedadSiCorresponde(guardado);
 
-        return contratoGuardado;
+        return guardado;
     }
 
-    @Transactional
-    public Contrato modificar(Long id, Contrato datosNuevos) {
-        Contrato contratoActual = buscarPorId(id);
+    public Contrato actualizar(Long id, Contrato datosActualizados) {
+        Contrato contrato = buscarPorId(id);
 
-        EstadoContrato estadoAnterior = contratoActual.getEstadoContrato();
-        EstadoContrato estadoNuevo = datosNuevos.getEstadoContrato();
+        EstadoContrato estadoAnterior = contrato.getEstadoContrato();
 
-        validarTransicionEstado(estadoAnterior, estadoNuevo);
+        contrato.setPropiedad(datosActualizados.getPropiedad());
+        contrato.setInquilino(datosActualizados.getInquilino());
+        contrato.setFechaInicio(datosActualizados.getFechaInicio());
+        contrato.setDuracionMeses(datosActualizados.getDuracionMeses());
+        contrato.setImporteMensual(datosActualizados.getImporteMensual());
+        contrato.setDiaVencimientoMensual(datosActualizados.getDiaVencimientoMensual());
+        contrato.setDescripcion(datosActualizados.getDescripcion());
+        contrato.setEstadoContrato(datosActualizados.getEstadoContrato());
 
-        Propiedad propiedad = contratoActual.getPropiedad();
+        validarContrato(contrato, id);
 
-        if (estadoNuevo == EstadoContrato.ACTIVO && estadoAnterior != EstadoContrato.ACTIVO) {
-            validarActivacionContrato(propiedad, id);
-            cambiarEstadoPropiedad(propiedad, EstadoDisponibilidad.ALQUILADA);
+        Contrato guardado = contratoRepositorio.save(contrato);
+
+        if (estadoAnterior != guardado.getEstadoContrato()) {
+            registrarCambioEstado(guardado, estadoAnterior, guardado.getEstadoContrato());
         }
 
-        if ((estadoNuevo == EstadoContrato.FINALIZADO || estadoNuevo == EstadoContrato.RESCINDIDO)
-                && estadoAnterior == EstadoContrato.ACTIVO) {
-            cambiarEstadoPropiedad(propiedad, EstadoDisponibilidad.DISPONIBLE);
-        }
+        actualizarEstadoPropiedadSiCorresponde(guardado);
 
-        contratoActual.setInquilino(datosNuevos.getInquilino());
-        contratoActual.setFechaInicio(datosNuevos.getFechaInicio());
-        contratoActual.setDuracionMeses(datosNuevos.getDuracionMeses());
-        contratoActual.setImporteMensual(datosNuevos.getImporteMensual());
-        contratoActual.setDiaVencimientoMensual(datosNuevos.getDiaVencimientoMensual());
-        contratoActual.setDescripcion(datosNuevos.getDescripcion());
-        contratoActual.setEstadoContrato(estadoNuevo);
-
-        Contrato contratoGuardado = contratoRepositorio.save(contratoActual);
-
-        if (estadoAnterior != estadoNuevo) {
-            historialEstadoContratoRepositorio.save(
-                    new HistorialEstadoContrato(contratoGuardado, estadoAnterior, estadoNuevo)
-            );
-        }
-
-        return contratoGuardado;
+        return guardado;
     }
 
-    @Transactional
     public void eliminar(Long id) {
         Contrato contrato = buscarPorId(id);
 
-        if (contrato.getEstadoContrato() != EstadoContrato.BORRADOR) {
-            throw new IllegalArgumentException("Solo pueden eliminarse contratos en estado borrador");
+        if (contrato.getEstadoContrato() == EstadoContrato.ACTIVO) {
+            throw new IllegalArgumentException("No se puede eliminar un contrato activo");
         }
 
         contrato.setEliminado(true);
         contratoRepositorio.save(contrato);
     }
 
-    private void validarActivacionContrato(Propiedad propiedad, Long idContratoActual) {
+    private void validarContrato(Contrato contrato, Long idActual) {
+        if (contrato.getPropiedad() == null) {
+            throw new IllegalArgumentException("Debe seleccionar una propiedad");
+        }
+
+        if (contrato.getInquilino() == null) {
+            throw new IllegalArgumentException("Debe seleccionar un inquilino");
+        }
+
+        if (contrato.getEstadoContrato() == EstadoContrato.ACTIVO) {
+            validarContratoActivo(contrato, idActual);
+        }
+    }
+
+    private void validarContratoActivo(Contrato contrato, Long idActual) {
+        Propiedad propiedad = contrato.getPropiedad();
+
         if (Boolean.TRUE.equals(propiedad.getEliminado())) {
-            throw new IllegalArgumentException("No se puede activar un contrato sobre una propiedad eliminada");
+            throw new IllegalArgumentException("No se puede crear un contrato activo sobre una propiedad eliminada");
         }
 
-        if (propiedad.getEstadoDisponibilidad() != EstadoDisponibilidad.DISPONIBLE) {
-            throw new IllegalArgumentException("No se puede activar el contrato porque la propiedad no está disponible");
+        boolean existeContratoActivo;
+
+        if (idActual == null) {
+            existeContratoActivo = contratoRepositorio
+                    .existsByPropiedadAndEstadoContratoAndEliminadoFalse(
+                            propiedad,
+                            EstadoContrato.ACTIVO);
+        } else {
+            existeContratoActivo = contratoRepositorio
+                    .existsByPropiedadAndEstadoContratoAndEliminadoFalseAndIdNot(
+                            propiedad,
+                            EstadoContrato.ACTIVO,
+                            idActual);
         }
 
-        Optional<Contrato> contratoActivo = contratoRepositorio
-                .findByPropiedadAndEstadoContratoAndEliminadoFalse(propiedad, EstadoContrato.ACTIVO);
-
-        if (contratoActivo.isPresent()
-                && (idContratoActual == null || !contratoActivo.get().getId().equals(idContratoActual))) {
-            throw new IllegalArgumentException("La propiedad ya tiene un contrato activo");
-        }
-    }
-
-    private void validarTransicionEstado(EstadoContrato estadoAnterior, EstadoContrato estadoNuevo) {
-        if ((estadoAnterior == EstadoContrato.FINALIZADO || estadoAnterior == EstadoContrato.RESCINDIDO)
-                && estadoNuevo == EstadoContrato.ACTIVO) {
-            throw new IllegalArgumentException("No se puede volver de finalizado o rescindido a activo");
-        }
-
-        boolean transicionValida =
-                estadoAnterior == estadoNuevo
-                        || (estadoAnterior == EstadoContrato.BORRADOR && estadoNuevo == EstadoContrato.ACTIVO)
-                        || (estadoAnterior == EstadoContrato.ACTIVO && estadoNuevo == EstadoContrato.FINALIZADO)
-                        || (estadoAnterior == EstadoContrato.ACTIVO && estadoNuevo == EstadoContrato.RESCINDIDO);
-
-        if (!transicionValida) {
-            throw new IllegalArgumentException("Cambio de estado de contrato no permitido");
+        if (existeContratoActivo) {
+            throw new IllegalArgumentException("Ya existe un contrato activo para esa propiedad");
         }
     }
 
-    private void cambiarEstadoPropiedad(Propiedad propiedad, EstadoDisponibilidad nuevoEstado) {
-        EstadoDisponibilidad estadoAnterior = propiedad.getEstadoDisponibilidad();
+    private void actualizarEstadoPropiedadSiCorresponde(Contrato contrato) {
+        Propiedad propiedad = contrato.getPropiedad();
 
-        if (estadoAnterior != nuevoEstado) {
-            propiedad.setEstadoDisponibilidad(nuevoEstado);
-            Propiedad propiedadGuardada = propiedadRepositorio.save(propiedad);
-
-            historialEstadoPropiedadRepositorio.save(
-                    new HistorialEstadoPropiedad(propiedadGuardada, estadoAnterior, nuevoEstado)
-            );
+        if (propiedad == null) {
+            return;
         }
+
+        if (contrato.getEstadoContrato() == EstadoContrato.ACTIVO) {
+            propiedad.setEstadoDisponibilidad(EstadoDisponibilidad.ALQUILADA);
+            propiedadRepositorio.save(propiedad);
+        }
+    }
+
+    private void registrarCambioEstado(
+            Contrato contrato,
+            EstadoContrato estadoAnterior,
+            EstadoContrato estadoNuevo) {
+
+        HistorialEstadoContrato historial = new HistorialEstadoContrato();
+        historial.setContrato(contrato);
+        historial.setEstadoAnterior(estadoAnterior);
+        historial.setEstadoNuevo(estadoNuevo);
+        historial.setFechaCambio(LocalDateTime.now());
+
+        historialEstadoContratoRepositorio.save(historial);
     }
 }

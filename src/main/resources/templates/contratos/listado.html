@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Contratos</title>
+</head>
+<body>
+
+<h1>Gestión de Contratos</h1>
+
+<p>
+    <a th:href="@{/}">Volver al inicio</a>
+</p>
+
+<p>
+    <a th:href="@{/contratos/nuevo}">Nuevo contrato</a>
+</p>
+
+<div th:if="${mensaje}">
+    <p th:text="${mensaje}" style="color: green;"></p>
+</div>
+
+<div th:if="${error}">
+    <p th:text="${error}" style="color: red;"></p>
+</div>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Propiedad</th>
+        <th>Inquilino</th>
+        <th>Fecha inicio</th>
+        <th>Duración</th>
+        <th>Importe mensual</th>
+        <th>Vencimiento</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="contrato : ${contratos}">
+        <td th:text="${contrato.id}"></td>
+        <td th:text="${contrato.propiedad.direccion + ' - ' + contrato.propiedad.ciudad}"></td>
+        <td th:text="${contrato.inquilino.apellido + ', ' + contrato.inquilino.nombre}"></td>
+        <td th:text="${contrato.fechaInicio}"></td>
+        <td th:text="${contrato.duracionMeses + ' meses'}"></td>
+        <td th:text="${contrato.importeMensual}"></td>
+        <td th:text="${contrato.diaVencimientoMensual}"></td>
+        <td th:text="${contrato.estadoContrato}"></td>
+        <td>
+            <a th:href="@{/contratos/editar/{id}(id=${contrato.id})}">Editar</a>
+
+            <form th:action="@{/contratos/eliminar/{id}(id=${contrato.id})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit">Eliminar</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

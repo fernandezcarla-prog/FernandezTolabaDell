@@ -14,14 +14,24 @@ public interface ContratoRepositorio extends JpaRepository<Contrato, Long> {
 
     List<Contrato> findByEliminadoFalse();
 
-    Optional<Contrato> findByPropiedadAndEstadoContratoAndEliminadoFalse(
-            Propiedad propiedad,
-            EstadoContrato estadoContrato
-    );
+    Optional<Contrato> findByIdAndEliminadoFalse(Long id);
 
     List<Contrato> findByEstadoContratoAndEliminadoFalse(EstadoContrato estadoContrato);
 
+    List<Contrato> findByPropiedadAndEliminadoFalse(Propiedad propiedad);
+
+    Optional<Contrato> findByPropiedadAndEstadoContratoAndEliminadoFalse(
+            Propiedad propiedad,
+            EstadoContrato estadoContrato);
+
     List<Contrato> findByInquilinoAndEliminadoFalse(Persona inquilino);
 
-    List<Contrato> findByPropiedadAndEliminadoFalse(Propiedad propiedad);
+    boolean existsByPropiedadAndEstadoContratoAndEliminadoFalse(
+            Propiedad propiedad,
+            EstadoContrato estadoContrato);
+
+    boolean existsByPropiedadAndEstadoContratoAndEliminadoFalseAndIdNot(
+            Propiedad propiedad,
+            EstadoContrato estadoContrato,
+            Long id);
 }
