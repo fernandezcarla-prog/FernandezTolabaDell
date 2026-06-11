@@ -1,0 +1,47 @@
+Trabajo Práctico Integrador - Actividad 03
+
+Integrantes:
+- Carla Fernandez - cfernandezbenitez@frsf.utn.edu.ar
+- Oscar Dell - odell@frsf.utn.edu.ar
+- Tolaba Marcelo - martolaba@abc.gob.ar
+
+Repositorio GitHub:
+https://github.com/fernandezcarla-prog/FernandezTolabaDell
+
+Branch a corregir:
+main
+
+Historias / funcionalidades implementadas:
+
+Carla Marina Fernandez Benitez:
+Configuración inicial del proyecto Spring Boot.
+Configuración de dependencias Maven.
+Conexión del sistema con MySQL.
+Creación de entidades principales del modelo.
+Gestión de Personas: alta, listado y validaciones básicas.
+Gestión de Propiedades: alta, modificación, eliminación lógica, listado y validaciones.
+Creación y configuración del repositorio GitHub.
+Integración general de los módulos.
+
+Oscar Dell:
+
+Gestión de Publicaciones.
+Alta de publicaciones asociadas a propiedades.
+Listado de publicaciones.
+Modificación y eliminación de publicaciones.
+Filtros de búsqueda por propiedad, ciudad, estado y rango de precio.
+Validaciones para evitar publicaciones activas duplicadas sobre una misma propiedad.
+Registro de cambios de estado de publicaciones.
+
+Marcelo Tolaba:
+
+Gestión de Contratos.
+Alta de contratos asociados a una propiedad y a un inquilino.
+Listado de contratos.
+Modificación y eliminación de contratos.
+Validaciones de contratos activos.
+Actualización del estado de disponibilidad de la propiedad al generar un contrato activo.
+Registro de cambios de estado de contratos.
+
+Observaciones:
+El sistema permite registrar personas, registrar propiedades, crear publicaciones asociadas a propiedades disponibles y gestionar contratos de alquiler asociados a una propiedad y a un inquilino.
