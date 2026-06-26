@@ -108,8 +108,8 @@ public class ContratoServicio {
     public void eliminar(Long id) {
         Contrato contrato = buscarPorId(id);
 
-        if (contrato.getEstadoContrato() == EstadoContrato.ACTIVO) {
-            throw new IllegalArgumentException("No se puede eliminar un contrato activo");
+        if (contrato.getEstadoContrato() != EstadoContrato.BORRADOR) {
+            throw new IllegalArgumentException("Solo se pueden eliminar contratos en estado borrador");
         }
 
         contrato.setEliminado(true);
