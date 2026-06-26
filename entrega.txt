@@ -1,9 +1,10 @@
-Trabajo Práctico Integrador - Actividad 03
+Trabajo Practico Integrador - Actividad 03
 
 Integrantes:
-- Carla Fernandez - cfernandezbenitez@frsf.utn.edu.ar
-- Oscar Dell - odell@frsf.utn.edu.ar
-- Tolaba Marcelo - martolaba@abc.gob.ar
+
+Carla Fernandez - cfernandezbenitez@frsf.utn.edu.ar
+Oscar Dell - odell@frsf.utn.edu.ar
+Tolaba Marcelo - martolaba@abc.gob.ar
 
 Repositorio GitHub:
 https://github.com/fernandezcarla-prog/FernandezTolabaDell
@@ -13,35 +14,41 @@ main
 
 Historias / funcionalidades implementadas:
 
-Carla Marina Fernandez Benitez:
-Configuración inicial del proyecto Spring Boot.
-Configuración de dependencias Maven.
-Conexión del sistema con MySQL.
-Creación de entidades principales del modelo.
-Gestión de Personas: alta, listado y validaciones básicas.
-Gestión de Propiedades: alta, modificación, eliminación lógica, listado y validaciones.
-Creación y configuración del repositorio GitHub.
-Integración general de los módulos.
+Carla Fernandez:
+
+Configuracion inicial del proyecto Spring Boot
+Configuracion de dependencias Maven
+Conexion del sistema con MySQL
+Creacion de entidades principales del modelo
+Gestion de Personas: alta, listado y validaciones basicas
+Gestion de Propiedades: alta, modificacion, eliminacion logica, listado y validaciones
+Filtros de Propiedades por dirección, ciudad, tipo de propiedad y estado de disponibilidad
+Creacion y configuración del repositorio GitHub
+Integracion general de los modulos
 
 Oscar Dell:
 
-Gestión de Publicaciones.
-Alta de publicaciones asociadas a propiedades.
-Listado de publicaciones.
-Modificación y eliminación de publicaciones.
-Filtros de búsqueda por propiedad, ciudad, estado y rango de precio.
-Validaciones para evitar publicaciones activas duplicadas sobre una misma propiedad.
-Registro de cambios de estado de publicaciones.
+Gestion de Publicaciones
+Alta de publicaciones asociadas a propiedades
+Listado de publicaciones
+Modificacion y eliminacion de publicaciones
+Filtros de busqueda por propiedad, ciudad, estado y rango de precio
+Validaciones para evitar publicaciones activas duplicadas sobre una misma propiedad
+Registro de cambios de estado de publicaciones
 
-Marcelo Tolaba:
+Tolaba Marcelo:
 
-Gestión de Contratos.
-Alta de contratos asociados a una propiedad y a un inquilino.
-Listado de contratos.
-Modificación y eliminación de contratos.
-Validaciones de contratos activos.
-Actualización del estado de disponibilidad de la propiedad al generar un contrato activo.
-Registro de cambios de estado de contratos.
+Gestion de Contratos
+Alta de contratos asociados a una propiedad y a un inquilino
+Listado de contratos
+Modificacion y eliminacion de contratos
+Filtros de Contratos por propiedad, inquilino, estado y fecha de inicio
+Visualizacion del propietario de la propiedad en el listado de contratos
+Validaciones para evitar contratos activos duplicados sobre una misma propiedad
+Actualizacion del estado de disponibilidad de la propiedad al generar un contrato activo
+Registro de cambios de estado de contratos
 
 Observaciones:
-El sistema permite registrar personas, registrar propiedades, crear publicaciones asociadas a propiedades disponibles y gestionar contratos de alquiler asociados a una propiedad y a un inquilino.
+El sistema permite registrar personas, registrar propiedades, crear publicaciones asociadas a propiedades disponibles y gestionar contratos de alquiler asociados a una propiedad y a un inquilino
+La entidad Persona se utiliza para representar tanto propietarios como inquilinos
+El archivo script_inicial.sql permite inicializar la base de datos con datos de prueba para verificar el funcionamiento de personas, propiedades, publicaciones y contratos
