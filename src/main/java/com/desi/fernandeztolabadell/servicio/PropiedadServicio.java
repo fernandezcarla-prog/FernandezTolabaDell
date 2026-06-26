@@ -1,5 +1,6 @@
 package com.desi.fernandeztolabadell.servicio;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.desi.fernandeztolabadell.enums.EstadoContrato;
 import com.desi.fernandeztolabadell.enums.EstadoDisponibilidad;
+import com.desi.fernandeztolabadell.enums.TipoPropiedad;
 import com.desi.fernandeztolabadell.modelo.HistorialEstadoPropiedad;
 import com.desi.fernandeztolabadell.modelo.Propiedad;
 import com.desi.fernandeztolabadell.repositorio.ContratoRepositorio;
@@ -32,6 +34,24 @@ public class PropiedadServicio {
 
     public List<Propiedad> listarNoEliminadas() {
         return propiedadRepositorio.findByEliminadoFalse();
+    }
+    public List<Propiedad> listarFiltradas(
+            String direccion,
+            String ciudad,
+            TipoPropiedad tipoPropiedad,
+            EstadoDisponibilidad estadoDisponibilidad) {
+
+        return propiedadRepositorio.findByEliminadoFalse()
+                .stream()
+                .filter(propiedad -> direccion == null || direccion.isBlank()
+                        || propiedad.getDireccion().toLowerCase().contains(direccion.toLowerCase()))
+                .filter(propiedad -> ciudad == null || ciudad.isBlank()
+                        || propiedad.getCiudad().toLowerCase().contains(ciudad.toLowerCase()))
+                .filter(propiedad -> tipoPropiedad == null
+                        || propiedad.getTipoPropiedad() == tipoPropiedad)
+                .filter(propiedad -> estadoDisponibilidad == null
+                        || propiedad.getEstadoDisponibilidad() == estadoDisponibilidad)
+                .toList();
     }
 
     public Propiedad buscarPorId(Long id) {

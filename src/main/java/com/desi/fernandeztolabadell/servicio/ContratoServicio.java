@@ -1,5 +1,6 @@
 package com.desi.fernandeztolabadell.servicio;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,6 +33,25 @@ public class ContratoServicio {
 
     public List<Contrato> listarNoEliminados() {
         return contratoRepositorio.findByEliminadoFalse();
+    }
+
+    public List<Contrato> listarFiltrados(
+            Long propiedadId,
+            Long inquilinoId,
+            EstadoContrato estadoContrato,
+            LocalDate fechaInicio) {
+
+        return contratoRepositorio.findByEliminadoFalse()
+                .stream()
+                .filter(contrato -> propiedadId == null
+                        || contrato.getPropiedad().getId().equals(propiedadId))
+                .filter(contrato -> inquilinoId == null
+                        || contrato.getInquilino().getId().equals(inquilinoId))
+                .filter(contrato -> estadoContrato == null
+                        || contrato.getEstadoContrato() == estadoContrato)
+                .filter(contrato -> fechaInicio == null
+                        || contrato.getFechaInicio().equals(fechaInicio))
+                .toList();
     }
 
     public Contrato buscarPorId(Long id) {

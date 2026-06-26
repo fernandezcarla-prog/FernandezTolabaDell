@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.desi.fernandeztolabadell.enums.EstadoDisponibilidad;
@@ -30,8 +31,27 @@ public class PropiedadControlador {
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("propiedades", propiedadServicio.listarNoEliminadas());
+    public String listar(
+            @RequestParam(required = false) String direccion,
+            @RequestParam(required = false) String ciudad,
+            @RequestParam(required = false) TipoPropiedad tipoPropiedad,
+            @RequestParam(required = false) EstadoDisponibilidad estadoDisponibilidad,
+            Model model) {
+
+        model.addAttribute("propiedades", propiedadServicio.listarFiltradas(
+                direccion,
+                ciudad,
+                tipoPropiedad,
+                estadoDisponibilidad));
+
+        model.addAttribute("tiposPropiedad", TipoPropiedad.values());
+        model.addAttribute("estadosDisponibilidad", EstadoDisponibilidad.values());
+
+        model.addAttribute("direccion", direccion);
+        model.addAttribute("ciudad", ciudad);
+        model.addAttribute("tipoPropiedad", tipoPropiedad);
+        model.addAttribute("estadoDisponibilidad", estadoDisponibilidad);
+
         return "propiedades/listado";
     }
 

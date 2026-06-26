@@ -15,12 +15,11 @@ TRUNCATE TABLE personas;
 SET FOREIGN_KEY_CHECKS = 1;
 
 INSERT INTO personas (id, nombre, apellido, email, telefono, eliminado) VALUES
-(1, 'Carla', 'Fernandez', '[cfernandezbenitez@frsf.utn.edu.ar](mailto:cfernandezbenitez@frsf.utn.edu.ar)', '3425000001', 0),
-(2, 'Oscar', 'Dell', '[odell@frsf.utn.edu.ar](mailto:odell@frsf.utn.edu.ar)', '3425000002', 0),
-(3, 'Marcelo', 'Tolaba', '[martolaba@abc.gob.ar](mailto:martolaba@abc.gob.ar)', '3425000003', 0),
-(4, 'Juan', 'Perez', '[juan.perez@mail.com](mailto:juan.perez@mail.com)', '3425000004', 0),
-(5, 'Ana', 'Gomez', '[ana.gomez@mail.com](mailto:ana.gomez@mail.com)', '3425000005', 0);
-
+(1, 'Carla', 'Fernandez', 'cfernandezbenitez@frsf.utn.edu.ar', '3425000001', 0),
+(2, 'Oscar', 'Dell', 'odell@frsf.utn.edu.ar', '3425000002', 0),
+(3, 'Marcelo', 'Tolaba', 'martolaba@abc.gob.ar', '3425000003', 0),
+(4, 'Juan', 'Perez', 'juan.perez@mail.com', '3425000004', 0),
+(5, 'Ana', 'Gomez', 'ana.gomez@mail.com', '3425000005', 0);
 INSERT INTO propiedades (
 id,
 direccion,

@@ -20,6 +20,41 @@
     <p style="color: red;" th:text="${error}"></p>
 </div>
 
+<h2>Filtros</h2>
+
+<form th:action="@{/propiedades}" method="get">
+    <label>Dirección:</label>
+    <input type="text" name="direccion" th:value="${direccion}">
+
+    <label>Ciudad:</label>
+    <input type="text" name="ciudad" th:value="${ciudad}">
+
+    <label>Tipo:</label>
+    <select name="tipoPropiedad">
+        <option value="">Todos</option>
+        <option th:each="tipo : ${tiposPropiedad}"
+                th:value="${tipo}"
+                th:text="${tipo}"
+                th:selected="${tipoPropiedad == tipo}">
+        </option>
+    </select>
+
+    <label>Estado:</label>
+    <select name="estadoDisponibilidad">
+        <option value="">Todos</option>
+        <option th:each="estado : ${estadosDisponibilidad}"
+                th:value="${estado}"
+                th:text="${estado}"
+                th:selected="${estadoDisponibilidad == estado}">
+        </option>
+    </select>
+
+    <button type="submit">Buscar</button>
+    <a th:href="@{/propiedades}">Limpiar</a>
+</form>
+
+<h2>Listado</h2>
+
 <table border="1" cellpadding="8" cellspacing="0">
     <thead>
         <tr>

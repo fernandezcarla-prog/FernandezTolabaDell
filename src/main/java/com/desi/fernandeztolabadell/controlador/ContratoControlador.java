@@ -1,5 +1,8 @@
 package com.desi.fernandeztolabadell.controlador;
 
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -7,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.desi.fernandeztolabadell.enums.EstadoContrato;
@@ -35,8 +39,29 @@ public class ContratoControlador {
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("contratos", contratoServicio.listarNoEliminados());
+    public String listar(
+            @RequestParam(required = false) Long propiedadId,
+            @RequestParam(required = false) Long inquilinoId,
+            @RequestParam(required = false) EstadoContrato estadoContrato,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            Model model) {
+
+        model.addAttribute("contratos", contratoServicio.listarFiltrados(
+                propiedadId,
+                inquilinoId,
+                estadoContrato,
+                fechaInicio));
+
+        model.addAttribute("propiedades", propiedadServicio.listarNoEliminadas());
+        model.addAttribute("personas", personaServicio.listarNoEliminadas());
+        model.addAttribute("estadosContrato", EstadoContrato.values());
+
+        model.addAttribute("propiedadId", propiedadId);
+        model.addAttribute("inquilinoId", inquilinoId);
+        model.addAttribute("estadoContrato", estadoContrato);
+        model.addAttribute("fechaInicio", fechaInicio);
+
         return "contratos/listado";
     }
 
