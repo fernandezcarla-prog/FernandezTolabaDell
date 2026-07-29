@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.desi</groupId>
-	<artifactId>fernandeztolabadell</artifactId>
+	<artifactId>tolaba</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>FernandezTolabaDell</name>
+	<name>Tolaba</name>
 	<description>Trabajo Practico Integrador DESI Actividad 03</description>
 	<url/>
 	<licenses>

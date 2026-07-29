@@ -1,126 +1,146 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Contratos</title>
+    <title>InmoGesta - Consola de Contratos</title>
+    <link href="https://jsdelivr.net" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-<h1>Gestión de Contratos</h1>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary fw-bold">InmoGesta &bull; Control de Contratos</h1>
+        <div>
+            <a th:href="@{/}" class="btn btn-outline-secondary me-2">Menú Principal</a>
+            <a th:href="@{/contratos/nuevo}" class="btn btn-success">+ Registrar Contrato</a>
+        </div>
+    </div>
 
-<p>
-    <a th:href="@{/}">Volver al inicio</a>
-</p>
+    <!-- Mensajes Operativos Informativos -->
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
-<p>
-    <a th:href="@{/contratos/nuevo}">Nuevo contrato</a>
-</p>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
-<div th:if="${mensaje}">
-    <p style="color: green;" th:text="${mensaje}"></p>
+    <!-- Panel de Control de Filtros Dinámicos -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-dark text-white fw-semibold">Filtros de Búsqueda Avanzada</div>
+        <div class="card-body">
+            <form th:action="@{/contratos}" method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Propiedad Inmueble:</label>
+                    <select name="propiedadId" class="form-select form-select-sm">
+                        <option value="">-- Todas las Propiedades --</option>
+                        <option th:each="propiedad : ${propiedades}"
+                                th:value="${propiedad.id}"
+                                th:text="${propiedad.direccion + ' - ' + propiedad.ciudad}"
+                                th:selected="${propiedadId != null and propiedadId == propiedad.id}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Inquilino Asignado:</label>
+                    <select name="inquilinoId" class="form-select form-select-sm">
+                        <option value="">-- Todos los Inquilinos --</option>
+                        <option th:each="persona : ${personas}"
+                                th:value="${persona.id}"
+                                th:text="${persona.apellido + ', ' + persona.nombre}"
+                                th:selected="${inquilinoId != null and inquilinoId == persona.id}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Estado Legal:</label>
+                    <select name="estadoContrato" class="form-select form-select-sm">
+                        <option value="">-- Todos --</option>
+                        <option th:each="estado : ${estadosContrato}"
+                                th:value="${estado}"
+                                th:text="${estado}"
+                                th:selected="${estadoContrato == estado}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Fecha de Inicio:</label>
+                    <input type="date" name="fechaInicio" th:value="${fechaInicio}" class="form-control form-control-sm">
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end gap-1">
+                    <button type="submit" class="btn btn-sm btn-primary w-100">Filtrar</button>
+                    <a th:href="@{/contratos}" class="btn btn-sm btn-outline-secondary w-100">Restablecer</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Grilla Principal de Datos Contractuales -->
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark small text-uppercase">
+                    <tr>
+                        <th>ID</th>
+                        <th>Propiedad Inmueble</th>
+                        <th>Propietario</th>
+                        <th>Inquilino</th>
+                        <th>Fecha Inicio</th>
+                        <th>Plazo</th>
+                        <th>Canon Mensual</th>
+                        <th>Vence</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones Operativas</th>
+                    </tr>
+                </thead>
+                <tbody class="small">
+                    <tr th:each="contrato : ${contratos}">
+                        <td th:text="${contrato.id}" class="fw-bold text-secondary"></td>
+                        <td th:text="${contrato.propiedad != null ? contrato.propiedad.direccion + ' (' + contrato.propiedad.ciudad + ')' : 'No asignada'}"></td>
+                        <td th:text="${contrato.propiedad != null and contrato.propiedad.propietario != null ? contrato.propiedad.propietario.apellido + ', ' + contrato.propiedad.propietario.nombre : 'No asignado'}"></td>
+                        <td th:text="${contrato.inquilino != null ? contrato.inquilino.apellido + ', ' + contrato.inquilino.nombre : 'No asignado'}"></td>
+                        <td th:text="${#temporals.format(contrato.fechaInicio, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${contrato.duracionMeses + ' meses'}"></td>
+                        <td th:text="${'$ ' + #numbers.formatDecimal(contrato.importeMensual, 1, 'POINT', 2, 'COMMA')}" class="fw-bold text-success"></td>
+                        <td th:text="${'Día ' + contrato.diaVencimientoMensual}"></td>
+                        <td>
+                            <span th:text="${contrato.estadoContrato}"
+                                  th:classappend="${contrato.estadoContrato == T(com.tolaba.enums.EstadoContrato).ACTIVO} ? 'badge bg-success' : 
+                                                 (${contrato.estadoContrato == T(com.tolaba.enums.EstadoContrato).BORRADOR} ? 'badge bg-warning text-dark' : 'badge bg-danger')">
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm">
+                                <a th:href="@{/contratos/editar/{id}(id=${contrato.id})}" class="btn btn-outline-warning">Editar</a>
+                                
+                                <!-- Implementación de Usabilidad Condicional th:if -->
+                                <form th:if="${contrato.estadoContrato == T(com.tolaba.enums.EstadoContrato).BORRADOR}"
+                                      th:action="@{/contratos/eliminar/{id}(id=${contrato.id})}"
+                                      method="post"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('¿Confirma la baja lógica de este contrato borrador en InmoGesta?');">
+                                    <button type="submit" class="btn btn-outline-danger border-start-0 rounded-end">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(contratos)}">
+                        <td colspan="10" class="text-center text-muted py-4 fw-semibold">No se registran transacciones contractuales bajo los filtros seleccionados.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<div th:if="${error}">
-    <p style="color: red;" th:text="${error}"></p>
-</div>
-
-<h2>Filtros</h2>
-
-<form th:action="@{/contratos}" method="get">
-    <label>Propiedad:</label>
-    <select name="propiedadId">
-        <option value="">Todas</option>
-        <option th:each="propiedad : ${propiedades}"
-                th:value="${propiedad.id}"
-                th:text="${propiedad.direccion + ' - ' + propiedad.ciudad}"
-                th:selected="${propiedadId != null and propiedadId == propiedad.id}">
-        </option>
-    </select>
-
-    <label>Inquilino:</label>
-    <select name="inquilinoId">
-        <option value="">Todos</option>
-        <option th:each="persona : ${personas}"
-                th:value="${persona.id}"
-                th:text="${persona.nombreCompleto}"
-                th:selected="${inquilinoId != null and inquilinoId == persona.id}">
-        </option>
-    </select>
-
-    <label>Estado:</label>
-    <select name="estadoContrato">
-        <option value="">Todos</option>
-        <option th:each="estado : ${estadosContrato}"
-                th:value="${estado}"
-                th:text="${estado}"
-                th:selected="${estadoContrato == estado}">
-        </option>
-    </select>
-
-    <label>Fecha inicio:</label>
-    <input type="date" name="fechaInicio" th:value="${fechaInicio}">
-
-    <button type="submit">Buscar</button>
-    <a th:href="@{/contratos}">Limpiar</a>
-</form>
-
-<h2>Listado</h2>
-
-<table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Propiedad</th>
-            <th>Propietario</th>
-            <th>Inquilino</th>
-            <th>Fecha inicio</th>
-            <th>Duración</th>
-            <th>Importe mensual</th>
-            <th>Vencimiento</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr th:each="contrato : ${contratos}">
-            <td th:text="${contrato.id}"></td>
-
-            <td th:text="${contrato.propiedad != null ? contrato.propiedad.direccion + ' - ' + contrato.propiedad.ciudad : 'Sin propiedad'}"></td>
-
-            <td th:text="${contrato.propiedad != null and contrato.propiedad.propietario != null ? contrato.propiedad.propietario.nombreCompleto : 'Sin propietario'}"></td>
-
-            <td th:text="${contrato.inquilino != null ? contrato.inquilino.nombreCompleto : 'Sin inquilino'}"></td>
-
-            <td th:text="${contrato.fechaInicio}"></td>
-
-            <td th:text="${contrato.duracionMeses + ' meses'}"></td>
-
-            <td th:text="${contrato.importeMensual}"></td>
-
-            <td th:text="${contrato.diaVencimientoMensual}"></td>
-
-            <td th:text="${contrato.estadoContrato}"></td>
-
-            <td>
-                <a th:href="@{/contratos/editar/{id}(id=${contrato.id})}">Editar</a>
-
-                <form th:action="@{/contratos/eliminar/{id}(id=${contrato.id})}"
-                      method="post"
-                      style="display:inline;">
-                    <button type="submit"
-                            onclick="return confirm('¿Seguro que desea eliminar este contrato?');">
-                        Eliminar
-                    </button>
-                </form>
-            </td>
-        </tr>
-
-        <tr th:if="${#lists.isEmpty(contratos)}">
-            <td colspan="10">No hay contratos registrados.</td>
-        </tr>
-    </tbody>
-</table>
-
+<script src="https://jsdelivr.net"></script>
 </body>
 </html>
