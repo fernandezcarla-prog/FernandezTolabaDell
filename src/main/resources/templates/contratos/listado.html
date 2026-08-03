@@ -102,18 +102,22 @@
 
             <td th:text="${contrato.estadoContrato}"></td>
 
-            <td>
-                <a th:href="@{/contratos/editar/{id}(id=${contrato.id})}">Editar</a>
+			<td>
+			    <!-- El botón Editar queda siempre disponible -->
+			    <a th:href="@{/contratos/editar/{id}(id=${contrato.id})}">Editar</a>
 
-                <form th:action="@{/contratos/eliminar/{id}(id=${contrato.id})}"
-                      method="post"
-                      style="display:inline;">
-                    <button type="submit"
-                            onclick="return confirm('¿Seguro que desea eliminar este contrato?');">
-                        Eliminar
-                    </button>
-                </form>
-            </td>
+			    <!-- MODIFICACIÓN DE USABILIDAD: El formulario solo se dibuja en la pantalla si el estado es BORRADOR -->
+			    <form th:if="${contrato.estadoContrato == T(com.desi.fernandeztolabadell.enums.EstadoContrato).BORRADOR}"
+			          th:action="@{/contratos/eliminar/{id}(id=${contrato.id})}"
+			          method="post"
+			          style="display:inline;">
+			        <button type="submit"
+			                onclick="return confirm('¿Seguro que desea eliminar este contrato?');">
+			            Eliminar
+			        </button>
+			    </form>
+			</td>
+
         </tr>
 
         <tr th:if="${#lists.isEmpty(contratos)}">
